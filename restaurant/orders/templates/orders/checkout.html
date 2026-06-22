@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>إتمام الطلب – Despacito</title>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background: #fffaf5; color: #3e2723; max-width: 500px; margin: 40px auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #c9849a; border-radius: 8px; font-family: inherit; }
+        .btn { background: #c9849a; color: white; padding: 12px 24px; border: none; border-radius: 30px; font-size: 1rem; cursor: pointer; font-weight: bold; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>إتمام الطلب</h1>
+    {% if messages %}
+        {% for msg in messages %}
+            <p class="error">{{ msg }}</p>
+        {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>الاسم الثلاثي</label>
+            <input type="text" name="name" required>
+        </div>
+        <div class="form-group">
+            <label>رقم الطاولة</label>
+            <input type="number" name="table" required>
+        </div>
+        <div class="form-group">
+            <label>رقم الهاتف</label>
+            <input type="tel" name="phone" required>
+        </div>
+        <div class="form-group">
+            <label>رقم التأكيد</label>
+            <input type="password" name="confirmation_input" required placeholder="أدخل رقم التأكيد">
+        </div>
+        <button type="submit" class="btn">إرسال الطلب</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,601 @@
+1. Create folder
+2. Open Terminal inside
+3. Create Virtual Environment: python -m venv .venv
+4. Activate Virtual Environment: git bash => source .venv/Scripts/activate
+                            CMD/PowerShell => .venv\Scripts\activate
+5. Install Django inside Virtual Environment: pip install django
+6. Create New Project: django-admin startproject project .
+6.5. Run Development Server to test project: python manage.py runserver
+bind: localhost:8000 / 127.0.0.1:8000
+to close server from terminal: ctrl + c
+
+7. Create New Application: python manage.py startapp blog
+
+8. Empty Database Created: Initialize Database with Django Default Tables
+9. Generate SQL instructions in python: python manage.py makemigrations
+10. Apply migrations to Database: python manage.py migrate
+
+11. Create View Function in (blog/views.py): def func_name(request): HttpResponse(".......")
+12. Create URLPattern in (project/urls.py): urlpatterns = [ path("route", func_name)]
+
+---------------------------------------------------------------------------------
+
+https://www.google.com:3000/search
+
+https:// => HyperText Transfer Protocol (Secure)
+shop.google.com
+shop => Subdomain
+google => Second Level Domain
+com => Top-level Domain
+:3000 => Port (80 http - 443 https)
+/search => Path
+
+Windows Server / Linux
+Web Server => Apache / nginx
+Gateway => WSGI (Web Server Gateway Interface)/ASGI
+Backend Framework (Django) => 
+
+
+
+-------------------------------
+1. Connect to PostgreSQL: 
+1.1. Install via terminal: pip install psycopg2
+1.2. In settings.py:
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "..........",
+        "USER": "postgres",
+        "PASSWORD": "........",
+        "HOST": "localhost",
+        "PORT": "5432",
+    }
+}
+
+-------------------------------
+# Class => SQL Table (appname_classname)
+# Attributes => Column/Field ()
+# Parameter => Constraint
+# CREATE TABLE hr_employee (
+#   ssn INT PRIMARY KEY,
+#   emp_fn VARCHAR(20) NOT NULL,
+#   emp_mn VARCHAR(20),
+#   emp_ln VARCHAR(20) NOT NULL,
+# );
+
+
+# Common Field Options:
+# null=True
+# default=value
+# unique=True
+# primary_key=True
+# db_column='name' => column_name in SQL
+# choices=[] => Restrict values
+# editable=False
+
+
+# Character, Text Fields:
+# CharField() => VARCHAR
+# TextField() => Text
+# EmailField() => Validate as Email
+# URLField() => Validate as URL
+# SlugField() => new-image (kebab-case)
+
+
+# Numbers
+# IntegerField() => INT
+# FloatField()❌ =>
+# DecimalField()✅=>
+# PositiveIntegerField()
+# AutoField() => SERIAL
+
+
+# Date/Time
+# DateField()
+# TimeField()
+# DateTimeField()
+# DurationField()
+# Options:
+# auto_now => every update ("modified_at")
+# auto_now_add => once created ("created_at")
+
+
+# Boolean
+# BooleanField() => BOOL
+# NullBooleanField() => True False Null
+
+
+# Relationship (Cardinality Ratio)
+# OneToOneField()
+# ManyToManyField()
+# ForeignKey()
+
+# on_delete=
+# CASCADE => Delete employee if department is deleted
+# SET_NULL => Set null
+# PROTECT => Prevent deletion
+# SET_DEFAULT => Default Value
+# DO_NOTHING => Handle Manually (risky)
+
+
+# File/Media
+# FileField()
+# ImageField() => Pillow Package
+
+# Misc
+# UUIDField() => 818f41858-97c9-4e01-81a1-f9cd1616161616
+# GenericIPAddressField() => IPv4, IPv6
+# JSONField()
+
+-------------------------------
+# python manage.py sqlmigrate hr 0001 => SQL Instruction/Command (Transaction)
+# Generate SQL instructions in python format: python manage.py makemigrations
+# Convert to Real SQL and Apply migrations to Database: python manage.py migrate
+
+
+# To access db via shell(terminal): python manage.py shell
+# To Close python shell (InteractiveConsole): quit()
+
+
+# Perform Raw SQL
+Employee.objects.raw('SELECT * FROM hr_employee')
+
+
+# Full CRUD
+C => CREATE
+R => READ (All/Row)
+U => Update (Select then update)
+D => Delete (Select then delete)
+
+
+# SQL
+C => CREATE => INSERT INTO
+R => READ (All/Row) => SELECT
+U => Update => UPDATE
+D => Delete => DELETE
+
+
+# ORM
+C => CREATE => Model.objects.create(..................)
+R => READ (All/Row) => Model.objects.all() / Model.objects.filter() / Model.objects.get()
+U => Update => Model.objects.filter().update()
+D => Delete => Model.objects.filter().delete()
+
+-------------------------------
+# If anything Failed in DBMS using Query tool:
+TRUNCATE TABLE 
+    hr_workson, 
+    hr_dependent, 
+    hr_project, 
+    hr_employee, 
+    hr_departmentlocation, 
+    hr_department 
+RESTART IDENTITY CASCADE;
+-------------------------------
+Example:
+
+# Step 1: Create Department
+it = Department.objects.create(dep_name='IT')
+
+# Step 2: Create Employee
+ahmed = Employee.objects.create(
+    emp_fn='Ahmed',
+    emp_mn='Ali',
+    emp_ln='Hassan',
+    address='Cairo, Egypt',
+    gender='Male',
+    salary=3500.00,
+    birthdate='1990-05-20',
+    department=it
+)
+
+# Step 3: Create a second employee to act as supervisor
+mona = Employee.objects.create(
+    emp_fn='Mona',
+    emp_ln='Youssef',
+    address='Giza, Egypt',
+    gender='Female',
+    salary=4200.00,
+    birthdate='1988-09-12',
+    department=it,
+    supervisor=ahmed
+)
+
+# Step 4: Assign manager to department
+it.manager = ahmed
+it.save()
+
+# Step 5: Create a Project
+erp = Project.objects.create(
+    proj_name='ERP System',
+    location='Smart Village',
+    department=it
+)
+
+# Step 6: Link Employee to Project via WorksOn
+WorksOn.objects.create(employee=ahmed, project=erp, hours_per_week=25)
+WorksOn.objects.create(employee=mona, project=erp, hours_per_week=20)
+
+# Step 7: Add Dependent
+Dependent.objects.create(
+    employee=ahmed,
+    dep_name='Sara',
+    gender='Female',
+    birthdate='2015-05-01',
+    relationship='Daughter'
+)
+-------------------------------
+# Full CRUD Examples
+
+# Create
+Employee.objects.create(emp_fn="Ahmed", emp_mn="Mohamed", emp_ln="Omar", address="Beni Suef, Salah Salem", salary=20000.00, birthdate="1995-02-16", gender="Male", email="a@a.com", )
+
+
+# Read First
+Employee.objects.first()
+
+
+# Read Last
+Employee.objects.last()
+
+
+# Read All
+from hr.models import Employee => Django 5.2 ❌ (Auto Import)
+Employee.objects.all()
+
+
+# Read 
+Employee.objects.filter(emp_fn="Ahmed")
+
+
+# Read only one
+Employee.objects.get(pk=1)
+
+
+# Update:
+a = Employee.objects.filter(emp_fn="Ahmed")
+a.save()
+
+
+# Reverse Access (Relationship between two classes )
+# Method 1
+emp = Employee.objects.get(ssn=1)
+emp.dependents.all()
+# Method 2
+Employee.objects.get(ssn=1).dependents.all()
+
+
+# Update
+# Method 1
+Employee.objects.filter(emp_fn="Ahmed").update(salary=50000.00)
+# Method 2
+Employee.objects.get(ssn=1).update(salary=50000.00)
+# Method 3
+emp=Employee.objects.get(ssn=1)
+emp.salary = 50000.00
+emp.save()
+
+
+# Delete:
+Employee.objects.filter(emp_fn="Ahmed").delete()
+
+-------------------------------
+# filter options
+__exact: WHERE emp_fn = "Ahmed"
+Employee.objects.filter(emp_fn__exact="Ahmed").delete()
+
+__iexact
+Employee.objects.filter(emp_fn__iexact="Ahmed").delete()
+
+__contains: WHERE emp_fn LIKE "%a%"
+Employee.objects.filter(emp_fn__contains="a").delete()
+
+__icontains: WHERE emp_fn LIKE "%a%"
+Employee.objects.filter(emp_fn__icontains="a").delete()
+
+__startswith
+Employee.objects.filter(emp_fn__startswith="a").delete()
+
+__in: WHERE salary IN (...)
+Employee.objects.filter(salary__in=[5000.00,6000.00]).delete()
+
+__range: WHERE salary BETWEEN 1000.00 AND 10000.00
+Employee.objects.filter(salary__range=(1000.00,10000.000)).delete()
+
+__gt, __gte
+Employee.objects.filter(salary__gte=1000.000).delete()
+
+__lt, __lte
+Employee.objects.filter(salary__lte=10000.000).delete()
+
+
+# Aggregation: count(), max() min() avg()
+Employee.objects.count()
+
+-------------------------------
+# ❌❌❌❌❌ F Object, Q Object, Composite Keys (class Meta:): Self-Study (Important) ❌❌❌❌❌
+-------------------------------
+class Meta:  # not actual data, but rules, constrains, behaviors that apply to the model as whole
+    # Create uniqueness constraints
+    # Sort actual by default
+    # Set actual table name
+    # Set Permissions
+    # Add indexes
+
+    # Common Meta Options:
+
+    ordering = ["emp_fn"]  # Ascending => emp_fn
+    # ordering = ["-emp_fn"]  # Descending => emp_fn
+
+    # Employee.objects.all() => Ordered based on emp_fn
+
+    db_table = "company_employees"
+
+    # Deprecated 3.2 => Composite key
+    # unique_together = [["emp_fn", "emp_mn", "emp_ln"]]
+
+    # New in 3.2+
+    constraints = [
+        models.UniqueConstraint(
+            fields=["emp_fn", "emp_mn", "emp_ln"], name="unique_fullname"
+        ),
+        models.CheckConstraint(check=Q(salary__gte=0), name="positive_salary"),
+    ]
+
+    # human-readable name
+    verbose_name = "Employee"
+    verbose_name_plural = "Employees"
+
+    # set reverse relation name globally
+    default_related_name = "employees"
+
+-------------------------------
+
+Admin Dashboard (Built-in)
+
+1. Create Super User: python manage.py createsuperuser
+2. Enter Valid Username, Email, Password, Repeat Password
+3. http://127.0.0.1:8000/admin/
+4. Enter Username, Password
+
+
+5. Register Models => hr/admin.py
+admin.site.register(Employee)
+admin.site.register(Department)
+admin.site.register(DepartmentLocation)
+admin.site.register(Project)
+admin.site.register(WorksOn)
+admin.site.register(Dependent)
+
+-------------------------------
+
+def api(request): # Request Object
+    print(request)
+    print(type(request))
+    print("Request Method:", request.method)
+    print("Request Path:", request.path)
+    print("Request GET:", request.GET)      # Path Parameters of GET (from URL) 
+    print("Request POST:", request.POST)    # Path Parameters of POST (from Request Body) 
+    print("Request body:", request.body)
+    print("Request COOKIES:", request.COOKIES)
+    print("Request FILES:", request.FILES)
+    print("Request Headers:", request.META)
+    print("Request get_host():", request.get_host())
+    print("Request is_secure():", request.is_secure())
+    # print("Request is_ajax():", request.is_ajax())
+    # print("Request get_signed_cookie():", request.get_signed_cookie())
+    return HttpResponse("Hello this is api endpoint")
+
+-------------------------------
+Templates: html + python code
+
+project\settings.py:
+"DIRS": [BASE_DIR / "templates"],   => General Templates  => ./templates/*.html
+"APP_DIRS": True,                   => App Templates => ./hr/templates/hr/*.html
+
+
+Browser can't read templates => Server-Side Render (Convert to html using Template Engine + retrieve dat from Database)
+
+
+The Django template language
+
+variable => {{ variable_name }}
+template tags => {%    %} {%    %}
+
+    # cONDITIONAL rENDERING
+    {% if data.is_authenticated %}
+      <p>Hello, You are authenticated</p>
+    {% else %}
+      <p>You are not registered</p>
+    {% endif %}
+
+
+    {% for item in arr %}
+      <p>{{ forloop.counter }} - {{ item }}</p>
+    {% endfor %}
+
+
+# Special Variables inside {%  for  %}
+forloop.counter => Start from 1
+forloop.counter0 => start as index from 0
+forloop.first
+forloop.last
+forloop.revcounter
+
+# Template Inheritance  
+Base Template (Layout) => base.html => {% block %}
+Child Template => {% extends %}
+
+
+# Template Filters
+
+# Application Templates + Inheritance
+
+-------------------------------
+
+Static Files (CSS/JS/icons/Images)
+
+project\settings.py:
+
+STATIC_URL = "static/"
+
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
+
+To Connect with Static Files:
+1. {% load static %}
+2. For CSS
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+3. For JS
+    <script src="{% static 'js/script.js' %}"></script>
+4. For Images
+    <img src="{% static 'images/1.jpg' %}" alt="">
+
+# General Static File => ./static/.....
+# Application Static Files ./hr/static/hr/.....
+
+-------------------------------
+
+Media Files (Uploaded Files)
+
+project\settings.py:
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
+-------------------------------
+Views.py
+
+
+-------------------------------
+urls.py
+
+
+
+-------------------------------
+forms.py
+class => form tag
+attributes => Fields (Input tag)
+parameters => options/constraints (label tag)/(validator attributes)
+
+form.is_valid() => True, False
+
+Manual/HTML Forms - Automatic/Django Forms
+
+Parameters => Options
+label="Username" => Custom Label
+max_length=100 => maxlength="100"
+min_length=3 => minlength="3"
+help_text="Enter you user name"
+initial => value=""
+widget => Customize
+required=True
+disabled=True
+error_messages
+
+min_value => min=""
+max_value => max=""
+
+choices
+
+-------------------
+
+
+Fields => Widgets
+CharField => TextInput
+EmailField => EmailInput
+IntegerField => NumberInput
+DateField => DateInput
+BooleanField => CheckboxInput
+ChoiceField => Select
+
+
+
+url as anchor tag
+<a href="{% url 'json' %}">json</a>
+
+
+Query Parameters => form method = "get"
+request.GET.get('parameter')
+
+Body as URLEncoded => form method = "post"
+username = request.POST.get("username")
+
+Body as JSON
+    if request.method == "POST":
+        data = json.loads(request.body)
+        User.objects.create(data)
+
+
+Path parameters => Url *args & **kwargs
+
+http://localhost:8000/data/:username/:email
+
+
+-------------------------------
+Class-based Views
+
+
+-------------------------------
+Authentication and Authorization => Built-in
+
+Authentication: Who are you ? are you logged in ?
+
+Authorization: Are you authorized to enter this page ? do you have permissions (RBAC)
+
+
+from django.contrib.auth.models import User => Built-in
+forms.py / views.py / urls.py
+except for templates => registration
+
+login / logout => Built-in
+register => auto by admin dashboard / manual by forms
+
+
+
+view decorators
+
+-------------------------------
+Django Rest Framework (DRF) => RESTFul APIs
+
+
+
+
+Front-end
+Serialize / Stringify => Convert from JS Object to Sting(JSON)
+Deserialize / Parse   => Convert from Sting(JSON) to JS Object
+
+Back-end
+Serialize / Stringify => Convert from Python Object(Dictionary) to Sting(JSON)
+Deserialize / Parse   => Convert from Sting(JSON) to Python Object(Dictionary)
+
+
+Serializer => Django Model
+
+
+1. Create folder
+2. Open Terminal inside
+3. Create Virtual Environment: python -m venv .venv
+4. Activate Virtual Environment: git bash => source .venv/Scripts/activate
+                            CMD/PowerShell => .venv\Scripts\activate
+5. Install Django inside Virtual Environment: pip install django djangorestframework
+6. Create New Project: django-admin startproject project .
+6.5. Run Development Server to test project: python manage.py runserver
+bind: localhost:8000 / 127.0.0.1:8000
+to close server from terminal: ctrl + c
+
+7. Create New Application: python manage.py startapp blog
+
+8. Empty Database Created: Initialize Database with Django Default Tables
+9. Generate SQL instructions in python: python manage.py makemigrations
+10. Apply migrations to Database: python manage.py migrate
+
+11. Create ViewSets in (blog/views.py): def func_name(request): HttpResponse(".......")
+12. Create Routers in (project/urls.py): urlpatterns = [ path("route", func_name)]
+
+13. Add 'rest_framework' to INSTALLED_APPS

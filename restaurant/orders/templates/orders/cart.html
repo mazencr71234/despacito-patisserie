@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سلة المشتريات – Despacito</title>
+    <style>
+        /* استخدم نفس ستايل الموقع أو اختصر */
+        body { font-family: 'Cairo', sans-serif; background: #fffaf5; color: #3e2723; max-width: 800px; margin: 40px auto; padding: 20px; }
+        .cart-table { width: 100%; border-collapse: collapse; }
+        .cart-table th, .cart-table td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
+        .qty-btn { background: #c9849a; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 50%; }
+        .remove-btn { background: #b1687b; }
+        .total { font-size: 1.2rem; font-weight: bold; margin: 20px 0; }
+        .btn { background: #c9849a; color: white; padding: 10px 24px; border: none; border-radius: 30px; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🛒 سلة المشتريات</h1>
+    {% if items %}
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>المنتج</th>
+                    <th>الكمية</th>
+                    <th>السعر</th>
+                    <th>الإجمالي</th>
+                    <th>إزالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in items %}
+                <tr>
+                    <td>{{ entry.item.name }}</td>
+                    <td>
+                        <button class="qty-btn" onclick="updateQty({{ entry.item.id }}, {{ entry.quantity|add:-1 }})">-</button>
+                        {{ entry.quantity }}
+                        <button class="qty-btn" onclick="updateQty({{ entry.item.id }}, {{ entry.quantity|add:1 }})">+</button>
+                    </td>
+                    <td>{{ entry.item.price }} ج.م</td>
+                    <td>{{ entry.subtotal }} ج.م</td>
+                    <td><button class="qty-btn remove-btn" onclick="removeItem({{ entry.item.id }})">×</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p class="total">الإجمالي: {{ total }} ج.م</p>
+        <a href="{% url 'checkout' %}" class="btn">إتمام الطلب</a>
+    {% else %}
+        <p>السلة فارغة.</p>
+        <a href="{% url 'menu' %}" class="btn">عرض القائمة</a>
+    {% endif %}
+
+    <script>
+        const csrftoken = '{{ csrf_token }}';
+        function updateQty(itemId, newQty) {
+            if (newQty < 0) return;
+            fetch(`/update-cart/${itemId}/`, {
+                method: 'POST',
+                headers: {'X-CSRFToken': csrftoken, 'Content-Type': 'application/json'},
+                body: JSON.stringify({ quantity: newQty })
+            }).then(() => location.reload());
+        }
+        function removeItem(itemId) {
+            fetch(`/remove-cart/${itemId}/`, {
+                method: 'POST',
+                headers: {'X-CSRFToken': csrftoken, 'Content-Type': 'application/json'},
+                body: JSON.stringify({})
+            }).then(() => location.reload());
+        }
+    </script>
+</body>
+</html>

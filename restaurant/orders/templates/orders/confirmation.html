@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تم الطلب – Despacito</title>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background: #fffaf5; text-align: center; padding: 80px 20px; }
+        .box { background: white; border-radius: 24px; padding: 40px; box-shadow: 0 8px 24px rgba(74,44,42,0.1); max-width: 500px; margin: auto; }
+        h1 { color: #4a2c2a; }
+        .order-id { font-size: 1.5rem; color: #c9849a; }
+        .btn { background: #c9849a; color: white; padding: 10px 24px; border-radius: 30px; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🎉 شكراً لك!</h1>
+        <p>تم استلام طلبك رقم</p>
+        <p class="order-id">#{{ order.id }}</p>
+        <p>سيتم تجهيزه قريباً.</p>
+        <p>رقم التأكيد: <strong>{{ order.confirmation_code|default:"لم يُحدد بعد" }}</strong></p>
+        <a href="{% url 'menu' %}" class="btn">العودة للقائمة</a>
+    </div>
+</body>
+</html>
