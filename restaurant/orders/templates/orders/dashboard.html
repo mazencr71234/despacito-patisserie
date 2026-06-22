@@ -51,7 +51,7 @@
 
         <!-- تعديل رقم التأكيد العام -->
         <div class="setting-box">
-            <h3 style="margin-bottom:10px;">رقم التأكيد الحالي: <span id="currentCode" style="color:var(--rose-dark);">{{ site_setting.confirmation_code|default:'mazen123' }}</span></h3>
+            <h3 style="margin-bottom:10px;">رقم التأكيد الحالي: <span style="color:var(--rose-dark);">******</span></h3>
             <form method="post" style="display:flex;gap:10px;align-items:center;">
                 {% csrf_token %}
                 <input type="text" name="new_confirmation_code" placeholder="أدخل رقم التأكيد الجديد" class="code-input" required>

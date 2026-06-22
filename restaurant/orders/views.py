@@ -196,10 +196,10 @@ def admin_dashboard(request):
             new_code = request.POST.get('new_confirmation_code', '').strip()
             if new_code:
                 if site_setting:
-                    site_setting.confirmation_code = new_code
+                    site_setting.confirmation_code = make_password(new_code)
                     site_setting.save()
                 else:
-                    SiteSetting.objects.create(confirmation_code=new_code)
+                    SiteSetting.objects.create(confirmation_code=make_password(new_code))
                 messages.success(request, "تم تحديث رقم التأكيد")
             return redirect('admin_dashboard')
         else:

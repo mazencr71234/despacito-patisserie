@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.hashers import make_password, check_password
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -53,9 +52,6 @@ class SiteSetting(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk and SiteSetting.objects.exists():
             raise Exception("يوجد بالفعل إعدادات للموقع، يمكنك تعديلها فقط.")
-        # Hash the confirmation code before saving
-        if self.confirmation_code and not self.confirmation_code.startswith('pbkdf2_sha256$'):
-            self.confirmation_code = make_password(self.confirmation_code)
         super().save(*args, **kwargs)
 
     def __str__(self):
